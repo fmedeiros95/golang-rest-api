@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"fmedeiros95/golang-rest-api/core"
+	"fmedeiros95/golang-rest-api/app/core"
 	"net/http"
 )
 

@@ -1,7 +1,7 @@
 package validations
 
 import (
-	"fmedeiros95/golang-rest-api/models"
+	"fmedeiros95/golang-rest-api/app/models"
 	"fmt"
 )
 

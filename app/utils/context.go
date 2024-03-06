@@ -2,7 +2,7 @@ package utils
 
 import (
 	"context"
-	"fmedeiros95/golang-rest-api/models"
+	"fmedeiros95/golang-rest-api/app/models"
 )
 
 type contextKey string
