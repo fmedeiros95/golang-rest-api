@@ -1,0 +1,32 @@
+# Compiled Object files, Static and Dynamic libs (Shared Objects)
+*.o
+*.a
+*.so
+
+# Folders
+_obj
+_test
+
+# Enviroment files
+.env
+
+# Compiled Go packages
+*.test
+
+# Local binary files
+/bin/
+/pkg/
+/vendor/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+
+# Specific to golang-rest-api project
+golang-rest-api
