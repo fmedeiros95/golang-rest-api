@@ -17,5 +17,5 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		Version: "0.0.1",
 		Author:  "Felipe Medeiros <medeiros.dev@gmail.com>",
 	}
-	core.RespondWithJSON(w, http.StatusOK, metadata)
+	core.RespondWithJSON(w, http.StatusOK, metadata, "")
 }

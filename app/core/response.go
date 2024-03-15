@@ -5,20 +5,22 @@ import (
 	"net/http"
 )
 
-type ErrorResponse struct {
-	StatusCode int    `json:"statusCode"`
-	Error      string `json:"error"`
+type Response struct {
+	StatusCode int         `json:"statusCode"`
+	Message    string      `json:"message,omitempty"`
+	Data       interface{} `json:"data,omitempty"`
 }
 
 func RespondWithError(w http.ResponseWriter, statusCode int, message string) {
-	response := ErrorResponse{Error: message, StatusCode: statusCode}
+	response := Response{Message: message, StatusCode: statusCode}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	json.NewEncoder(w).Encode(response)
 }
 
-func RespondWithJSON(w http.ResponseWriter, statusCode int, data interface{}) {
+func RespondWithJSON(w http.ResponseWriter, statusCode int, data interface{}, message string) {
+	response := Response{Message: message, StatusCode: statusCode, Data: &data}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(data)
+	json.NewEncoder(w).Encode(response)
 }

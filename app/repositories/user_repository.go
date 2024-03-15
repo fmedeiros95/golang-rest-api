@@ -14,10 +14,9 @@ func NewUserRepository(db *core.Database) *UserRepository {
 	return &UserRepository{db}
 }
 
-func (ur *UserRepository) ListUsers(pageNum, pageLimit int) (*[]models.User, error) {
+func (ur *UserRepository) ListUsers() (*[]models.User, error) {
 	var users []models.User
-	offset := (pageNum - 1) * pageLimit
-	result := ur.db.Offset(offset).Limit(pageLimit).Find(&users)
+	result := ur.db.Find(&users)
 	if result.Error != nil {
 		return nil, errors.New("user not found")
 	}
@@ -38,13 +37,17 @@ func (ur *UserRepository) GetUserByID(userId uint) (*models.User, error) {
 	return &user, nil
 }
 
-func (ur *UserRepository) GetUserByEmail(username string) (*models.User, error) {
+func (ur *UserRepository) GetUserByEmail(email string) (*models.User, error) {
 	var user models.User
-	result := ur.db.Where("email = ?", username).First(&user)
+	result := ur.db.Where("email = ?", email).First(&user)
 	if result.Error != nil {
 		return nil, errors.New("user not found")
 	}
 	return &user, nil
+}
+
+func (ur *UserRepository) UpdateUser(user models.User) error {
+	return ur.db.Save(user).Error
 }
 
 func (ur *UserRepository) DeleteUser(user models.User) error {

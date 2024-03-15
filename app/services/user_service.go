@@ -16,8 +16,8 @@ func NewUserService(db *core.Database) *UserService {
 	}
 }
 
-func (us *UserService) ListUsers(pageNum, pageLimit int) (*[]models.User, error) {
-	users, err := us.userRepository.ListUsers(pageNum, pageLimit)
+func (us *UserService) ListUsers() (*[]models.User, error) {
+	users, err := us.userRepository.ListUsers()
 	if err != nil {
 		return nil, err
 	}
@@ -36,6 +36,10 @@ func (us *UserService) FindUser(userId uint) (*models.User, error) {
 
 func (us *UserService) CreateUser(user *models.User) error {
 	return us.userRepository.CreateUser(user)
+}
+
+func (us *UserService) UpdateUser(user models.User) error {
+	return us.userRepository.UpdateUser(user)
 }
 
 func (us *UserService) DeleteUser(user models.User) error {

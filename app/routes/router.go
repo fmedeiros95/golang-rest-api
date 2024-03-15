@@ -23,8 +23,8 @@ func SetupRoutes(db *core.Database) *mux.Router {
 	// ** Setup Users routes
 	userHandler := handlers.NewUserHandler(db)
 	userRoutes := r.PathPrefix("/users").Subrouter()
-	userRoutes.HandleFunc("/", userHandler.CreateUser).Methods("POST")
 	userRoutes.HandleFunc("/", userHandler.ListUsers).Methods("GET")
+	userRoutes.HandleFunc("/", userHandler.CreateUser).Methods("POST")
 	userRoutes.HandleFunc("/me", userHandler.AuthedUser).Methods("GET")
 	userRoutes.HandleFunc("/{id}", userHandler.FindUser).Methods("GET")
 	userRoutes.HandleFunc("/{id}", userHandler.UpdateUser).Methods("PATCH")
