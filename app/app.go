@@ -1,17 +1,17 @@
 package app
 
 import (
+	"encoding/json"
 	"fmedeiros95/golang-rest-api/app/core"
 	"fmedeiros95/golang-rest-api/app/routes"
+	"fmt"
 	"log"
-	"net/http"
-	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/gofiber/fiber/v2"
 )
 
 type App struct {
-	Router *mux.Router
+	Fiber *fiber.App
 }
 
 func (a *App) Initialize(config *core.EnvConfig) {
@@ -23,18 +23,40 @@ func (a *App) Initialize(config *core.EnvConfig) {
 		log.Fatal(err)
 	}
 
+	log.Print("🔧 Setting up Fiber...")
+	app := fiber.New(fiber.Config{
+		CaseSensitive: true,
+		ServerHeader:  "GoLang Rest API",
+		AppName:       "GoLang Rest API v0.0.1",
+	})
+
+	// app.Get("/", func(c *fiber.Ctx) error {
+	// 	type AppMetadata struct {
+	// 		Name    string `json:"name"`
+	// 		Version string `json:"version"`
+	// 		Author  string `json:"author"`
+	// 	}
+	// 	metadata := AppMetadata{
+	// 		Name:    "GoLang Rest API",
+	// 		Version: "0.0.1",
+	// 		Author:  "Felipe Medeiros <medeiros.dev@gmail.com>",
+	// 	}
+	// 	return core.RespondWithJSON(c, fiber.StatusOK, metadata, "")
+	// }).Name("index")
+	// app.Get("/routes", func(c *fiber.Ctx) error {
+	// 	return core.RespondWithJSON(c, fiber.StatusOK, app.Stack(), "")
+	// }).Name("routes")
+
 	log.Print("🚩 Setup routes...")
-	a.Router = routes.SetupRoutes(db)
+	routes.SetupRoutes(app, db)
+
+	data, _ := json.MarshalIndent(app.Stack(), "", "  ")
+	fmt.Print(string(data))
+
+	a.Fiber = app
 }
 
 func (a *App) Run() {
-	server := &http.Server{
-		Addr:         "0.0.0.0:" + core.Config.Port,
-		WriteTimeout: time.Second * 15,
-		ReadTimeout:  time.Second * 15,
-		IdleTimeout:  time.Second * 60,
-		Handler:      a.Router,
-	}
-	log.Print("🚀 Application started on: http://" + server.Addr)
-	log.Fatal(server.ListenAndServe())
+	log.Print("🚀 Application started!")
+	log.Fatal(a.Fiber.Listen(":" + core.Config.Port))
 }

@@ -1,8 +1,7 @@
 package core
 
 import (
-	"encoding/json"
-	"net/http"
+	"github.com/gofiber/fiber/v2"
 )
 
 type Response struct {
@@ -11,16 +10,12 @@ type Response struct {
 	Data       interface{} `json:"data,omitempty"`
 }
 
-func RespondWithError(w http.ResponseWriter, statusCode int, message string) {
+func RespondWithError(ctx *fiber.Ctx, statusCode int, message string) error {
 	response := Response{Message: message, StatusCode: statusCode}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(response)
+	return ctx.Status(statusCode).JSON(response)
 }
 
-func RespondWithJSON(w http.ResponseWriter, statusCode int, data interface{}, message string) {
+func RespondWithJSON(ctx *fiber.Ctx, statusCode int, data interface{}, message string) error {
 	response := Response{Message: message, StatusCode: statusCode, Data: &data}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(response)
+	return ctx.Status(statusCode).JSON(response)
 }

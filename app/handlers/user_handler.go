@@ -1,15 +1,11 @@
 package handlers
 
 import (
-	"encoding/json"
 	"fmedeiros95/golang-rest-api/app/core"
 	"fmedeiros95/golang-rest-api/app/models"
 	"fmedeiros95/golang-rest-api/app/services"
-	"fmedeiros95/golang-rest-api/app/utils"
-	"net/http"
-	"strconv"
 
-	"github.com/gorilla/mux"
+	"github.com/gofiber/fiber/v2"
 )
 
 type UserHandler struct {
@@ -22,90 +18,73 @@ func NewUserHandler(db *core.Database) *UserHandler {
 	}
 }
 
-func (uh *UserHandler) AuthedUser(w http.ResponseWriter, r *http.Request) {
-	user := utils.GetUserFromContext(r.Context())
-	core.RespondWithJSON(w, http.StatusOK, user, "User found successfully")
+func (uh *UserHandler) AuthedUser(c *fiber.Ctx) error {
+	// user := utils.GetUserFromContext(r.Context())
+	return core.RespondWithJSON(c, fiber.StatusOK, fiber.Map{"a": "b"}, "User found successfully")
 }
 
-func (uh *UserHandler) ListUsers(w http.ResponseWriter, r *http.Request) {
+func (uh *UserHandler) ListUsers(c *fiber.Ctx) error {
 	users, err := uh.userService.ListUsers()
 	if err != nil {
-		core.RespondWithError(w, http.StatusInternalServerError, "Error while trying to list users")
-		return
+		return core.RespondWithError(c, fiber.StatusInternalServerError, "Error while trying to list users")
 	}
-	core.RespondWithJSON(w, http.StatusOK, users, "Users found successfully")
+	return core.RespondWithJSON(c, fiber.StatusOK, users, "Users found successfully")
 }
 
-func (uh *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
+func (uh *UserHandler) CreateUser(c *fiber.Ctx) error {
 	var payload models.User
-	err := json.NewDecoder(r.Body).Decode(&payload)
-	if err != nil {
-		core.RespondWithError(w, http.StatusBadRequest, "Invalid request")
-		return
+	if err := c.BodyParser(&payload); err != nil {
+		return core.RespondWithError(c, fiber.StatusBadRequest, "Invalid request")
 	}
 
-	err = uh.userService.CreateUser(&payload)
-	if err != nil {
-		core.RespondWithError(w, http.StatusInternalServerError, "Error while trying to create user")
-		return
+	if err := uh.userService.CreateUser(&payload); err != nil {
+		return core.RespondWithError(c, fiber.StatusInternalServerError, "Error while trying to create user")
 	}
 
-	core.RespondWithJSON(w, http.StatusCreated, nil, "User created successfully")
+	return core.RespondWithJSON(c, fiber.StatusCreated, nil, "User created successfully")
 }
 
-func (uh *UserHandler) FindUser(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
+func (uh *UserHandler) FindUser(c *fiber.Ctx) error {
+	id, err := c.ParamsInt("id")
 	if err != nil {
-		core.RespondWithError(w, http.StatusBadRequest, "Invalid user id")
-		return
+		return core.RespondWithError(c, fiber.StatusBadRequest, "Invalid user id")
 	}
 
 	user, err := uh.userService.FindUser(uint(id))
 	if err != nil {
-		core.RespondWithError(w, http.StatusNotFound, "User not found")
-		return
+		return core.RespondWithError(c, fiber.StatusNotFound, "User not found")
 	}
 
-	core.RespondWithJSON(w, http.StatusOK, user, "User found successfully")
+	return core.RespondWithJSON(c, fiber.StatusOK, user, "User found successfully")
 }
 
-func (uh *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
+func (uh *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	var payload models.User
-	err := json.NewDecoder(r.Body).Decode(&payload)
-	if err != nil {
-		core.RespondWithError(w, http.StatusBadRequest, "Invalid request")
-		return
+	if err := c.BodyParser(&payload); err != nil {
+		return core.RespondWithError(c, fiber.StatusBadRequest, "Invalid request")
 	}
 
-	err = uh.userService.UpdateUser(payload)
-	if err != nil {
-		core.RespondWithError(w, http.StatusInternalServerError, "Error while trying to update user")
-		return
+	if err := uh.userService.UpdateUser(payload); err != nil {
+		return core.RespondWithError(c, fiber.StatusInternalServerError, "Error while trying to update user")
 	}
 
-	core.RespondWithJSON(w, http.StatusOK, nil, "User updated successfully")
+	return core.RespondWithJSON(c, fiber.StatusOK, nil, "User updated successfully")
 }
 
-func (uh *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
+func (uh *UserHandler) DeleteUser(c *fiber.Ctx) error {
+	id, err := c.ParamsInt("id")
 	if err != nil {
-		core.RespondWithError(w, http.StatusBadRequest, "Invalid user id")
-		return
+		return core.RespondWithError(c, fiber.StatusBadRequest, "Invalid user id")
 	}
 
 	user, err := uh.userService.FindUser(uint(id))
 	if err != nil {
-		core.RespondWithError(w, http.StatusNotFound, "User not found")
-		return
+		return core.RespondWithError(c, fiber.StatusNotFound, "User not found")
 	}
 
-	err = uh.userService.DeleteUser(*user)
-	if err != nil {
-		core.RespondWithError(w, http.StatusInternalServerError, "Error while trying to delete user")
-		return
+	if err := uh.userService.DeleteUser(*user); err != nil {
+		return core.RespondWithError(c, fiber.StatusInternalServerError, "Error while trying to delete user")
 	}
 
-	core.RespondWithJSON(w, http.StatusOK, nil, "User deleted successfully")
+	return core.RespondWithJSON(c, fiber.StatusOK, nil, "User deleted successfully")
 }
