@@ -58,20 +58,20 @@ func (am *AuthMiddleware) JWTAuthenticator(next http.Handler) http.Handler {
 		// ** Get token from headers
 		authorization := strings.Split(r.Header.Get("Authorization"), " ")
 		if authorization[0] != "Bearer" {
-			core.RespondWithError(w, http.StatusUnauthorized, "Invalid token type")
+			// core.RespondWithError(w, fiber.StatusUnauthorized, "Invalid token type")
 			return
 		}
 
 		// ** Check if the header has value
 		if authorization[1] == "" {
-			core.RespondWithError(w, http.StatusUnauthorized, "Authorization token is missing")
+			// core.RespondWithError(w, fiber.StatusUnauthorized, "Authorization token is missing")
 			return
 		}
 
 		// ** Check if token is valid
 		user, err := am.ValidateToken(authorization[1])
 		if err != nil {
-			core.RespondWithError(w, http.StatusUnauthorized, "Invalid token")
+			// core.RespondWithError(w, fiber.StatusUnauthorized, "Invalid token")
 			return
 		}
 

@@ -1,13 +1,13 @@
 package app
 
 import (
-	"encoding/json"
 	"fmedeiros95/golang-rest-api/app/core"
 	"fmedeiros95/golang-rest-api/app/routes"
-	"fmt"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
 type App struct {
@@ -29,29 +29,24 @@ func (a *App) Initialize(config *core.EnvConfig) {
 		ServerHeader:  "GoLang Rest API",
 		AppName:       "GoLang Rest API v0.0.1",
 	})
+	app.Use(cors.New())
+	app.Use(logger.New())
 
-	// app.Get("/", func(c *fiber.Ctx) error {
-	// 	type AppMetadata struct {
-	// 		Name    string `json:"name"`
-	// 		Version string `json:"version"`
-	// 		Author  string `json:"author"`
-	// 	}
-	// 	metadata := AppMetadata{
-	// 		Name:    "GoLang Rest API",
-	// 		Version: "0.0.1",
-	// 		Author:  "Felipe Medeiros <medeiros.dev@gmail.com>",
-	// 	}
-	// 	return core.RespondWithJSON(c, fiber.StatusOK, metadata, "")
-	// }).Name("index")
-	// app.Get("/routes", func(c *fiber.Ctx) error {
-	// 	return core.RespondWithJSON(c, fiber.StatusOK, app.Stack(), "")
-	// }).Name("routes")
+	app.Get("/", func(c *fiber.Ctx) error {
+		type AppMetadata struct {
+			Name    string `json:"name"`
+			Version string `json:"version"`
+			Author  string `json:"author"`
+		}
+		return core.RespondWithJSON(c, fiber.StatusOK, AppMetadata{
+			Name:    "GoLang Rest API",
+			Version: "0.0.1",
+			Author:  "Felipe Medeiros <medeiros.dev@gmail.com>",
+		}, "")
+	}).Name("index")
 
 	log.Print("🚩 Setup routes...")
 	routes.SetupRoutes(app, db)
-
-	data, _ := json.MarshalIndent(app.Stack(), "", "  ")
-	fmt.Print(string(data))
 
 	a.Fiber = app
 }
